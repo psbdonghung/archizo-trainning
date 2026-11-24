@@ -46,20 +46,56 @@
   <title>Archizo Training</title>
   <link rel="manifest" href="manifest.json">
 </head>
-<body style="background:#0E120C">
-  <!--
-    You can customize the "flutter_bootstrap.js" script.
-    This is useful to provide a custom configuration to the Flutter loader
-    or to give the user feedback during the initialization process.
-
-    For more details:
-    * https://docs.flutter.dev/platform-integration/web/initialization
-  -->
+<body style="background:#0E120C;margin:0">
+  <!-- Màn chờ: hiện ngay khi mở, tự ẩn khi app vẽ xong khung đầu tiên.
+       Nếu tải lâu hoặc lỗi thì hiện lý do và nút xử lý, thay vì màn đen. -->
+  <div id="loading" style="position:fixed;inset:0;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:24px;background:#0E120C;color:#F2F4EE;font:16px -apple-system,system-ui,sans-serif;text-align:center">
+    <img src="icons/Icon-192.png" width="96" height="96" alt="">
+    <div id="loading-text">Đang tải Archizo Training…</div>
+    <div id="loading-help" style="display:none;max-width:340px;color:#8D9089;font-size:14px;line-height:1.5">
+      <div id="loading-error" style="color:#FFB020;margin-bottom:12px;word-break:break-word"></div>
+      <button onclick="location.reload()" style="width:100%;padding:12px;border-radius:999px;border:0;background:#CFE80C;color:#0E120C;font-size:16px;margin-bottom:8px">Tải lại</button>
+      <button onclick="archizoReset()" style="width:100%;padding:12px;border-radius:999px;border:1px solid #CFE80C;background:none;color:#CFE80C;font-size:16px">Xóa bản lưu tạm và tải lại</button>
+      <div style="margin-top:8px">Nút thứ hai chỉ xóa bản app lưu tạm, không xóa dữ liệu bạn đã nhập.</div>
+    </div>
+  </div>
+  <script>
+    (function () {
+      var box = document.getElementById('loading');
+      function help(msg) {
+        if (!box.isConnected) return;
+        document.getElementById('loading-text').textContent =
+          msg ? 'Không mở được app.' : 'Tải lâu hơn bình thường. Hãy chờ thêm hoặc thử các nút dưới.';
+        if (msg) document.getElementById('loading-error').textContent = msg;
+        document.getElementById('loading-help').style.display = 'block';
+      }
+      window.addEventListener('flutter-first-frame', function () { box.remove(); });
+      window.addEventListener('error', function (e) { help('Lỗi: ' + (e.message || (e.target && e.target.src) || 'không rõ')); }, true);
+      window.addEventListener('unhandledrejection', function (e) { help('Lỗi: ' + (e.reason && (e.reason.message || e.reason))); });
+      setTimeout(function () { help(); }, 25000);
+      window.archizoReset = async function () {
+        try {
+          if ('serviceWorker' in navigator) {
+            for (const r of await navigator.serviceWorker.getRegistrations()) await r.unregister();
+          }
+          if (window.caches) {
+            for (const k of await caches.keys()) await caches.delete(k);
+          }
+        } catch (_) {}
+        location.reload();
+      };
+    })();
+  </script>
   <script src="flutter_bootstrap.js" async></script>
   <script>
-    // Service worker riêng (sw.js) để app mở được khi mất mạng.
+    // Không dùng service worker (dễ giữ bản cũ trên iPhone). Gỡ bản cũ nếu còn.
     if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => navigator.serviceWorker.register('sw.js'));
+      navigator.serviceWorker.getRegistrations().then(function (rs) {
+        rs.forEach(function (r) { r.unregister(); });
+      });
+    }
+    if (window.caches) {
+      caches.keys().then(function (ks) { ks.forEach(function (k) { caches.delete(k); }); });
     }
   </script>
 </body>
