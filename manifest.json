@@ -1,0 +1,35 @@
+{
+    "name": "Archizo Training",
+    "short_name": "Archizo Training",
+    "start_url": ".",
+    "display": "standalone",
+    "background_color": "#0E120C",
+    "theme_color": "#0E120C",
+    "description": "Theo dõi chỉ số cơ thể, kế hoạch tập và ăn uống tại nhà.",
+    "orientation": "portrait-primary",
+    "prefer_related_applications": false,
+    "icons": [
+        {
+            "src": "icons/Icon-192.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "icons/Icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        },
+        {
+            "src": "icons/Icon-maskable-192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "maskable"
+        },
+        {
+            "src": "icons/Icon-maskable-512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "maskable"
+        }
+    ]
+}
